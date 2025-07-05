@@ -1,7 +1,7 @@
 blueprint:
   name: Turn Off Lights When Sensor Triggers
   description: |
-    Turns off lights in a selected area when a sensor goes to a specific state (e.g., slide_2).
+    Turns off lights in a selected area when a sensor goes to a specific state (e.g., Slide 2).
   domain: automation
   input:
     sensor_entity:
@@ -16,11 +16,16 @@ blueprint:
       selector:
         select:
           options:
-            - slide_1
-            - slide_2
-            - single
-            - double
-            - long_press
+            - value: slide_1
+              label: Slide 1
+            - value: slide_2
+              label: Slide 2
+            - value: single
+              label: Single Press
+            - value: double
+              label: Double Press
+            - value: long_press
+              label: Long Press
           mode: dropdown
           multiple: false
     target_area:
