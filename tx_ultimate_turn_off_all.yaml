@@ -1,7 +1,8 @@
 blueprint:
-  name: Turn Off Lights When Sensor Triggers
+  name: Turn Off or Toggle Lights When Sensor Triggers or Switch Clicked
   description: |
-    Turns off lights in a selected area when a sensor goes to a specific state (e.g., Slide 2).
+    - Turns off lights in a selected area when a sensor goes to a specific state (e.g., Slide 2).
+    - Optionally, toggles a light when a switch is clicked.
   domain: automation
   input:
     sensor_entity:
@@ -10,6 +11,7 @@ blueprint:
       selector:
         entity:
           domain: sensor
+
     trigger_state:
       name: Trigger State
       description: The state that triggers the light to turn off.
@@ -28,22 +30,77 @@ blueprint:
               label: Long Press
           mode: dropdown
           multiple: false
+
     target_area:
       name: Target Area
       description: The area where lights should be turned off.
       selector:
         area:
 
+    enable_switch_toggle:
+      name: Enable Switch Toggle
+      description: Enable to also toggle a light when a switch is clicked.
+      default: false
+      selector:
+        boolean:
+
+    toggle_switch:
+      name: Toggle Switch
+      description: The switch used to toggle the light.
+      selector:
+        entity:
+          domain: switch
+      default: ""
+
+    toggle_light:
+      name: Toggle Light
+      description: The light to toggle when the switch is pressed.
+      selector:
+        entity:
+          domain: light
+      default: ""
+
 trigger:
   - platform: state
     entity_id: !input sensor_entity
     to: !input trigger_state
 
+  - platform: state
+    entity_id: !input toggle_switch
+    enabled: !input enable_switch_toggle
+
 condition: []
 
 action:
-  - service: light.turn_off
-    target:
-      area_id: !input target_area
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.entity_id == (inputs.toggle_switch | string) and inputs.enable_switch_toggle }}"
+        sequence:
+          - choose:
+              - conditions:
+                  - condition: state
+                    entity_id: !input toggle_switch
+                    state: "on"
+                sequence:
+                  - service: light.turn_on
+                    target:
+                      entity_id: !input toggle_light
+              - conditions:
+                  - condition: state
+                    entity_id: !input toggle_switch
+                    state: "off"
+                sequence:
+                  - service: light.turn_off
+                    target:
+                      entity_id: !input toggle_light
+
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.entity_id == (inputs.sensor_entity | string) }}"
+        sequence:
+          - service: light.turn_off
+            target:
+              area_id: !input target_area
 
 mode: single
