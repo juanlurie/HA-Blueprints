@@ -1,0 +1,81 @@
+blueprint:
+  name: TX Ultimate Gesture Control
+  description: >
+    Control lights or areas using swipes and touches from a Sonoff TX Ultimate panel
+    with ESPHome. Handles swipe up/down and tapping a touchfield.
+
+  domain: automation
+  input:
+    tx_device:
+      name: TX Ultimate Device
+      description: Select your TX Ultimate device running ESPHome.
+      selector:
+        device:
+          integration: esphome
+
+    swipe_up_target:
+      name: Swipe Up - Turn On
+      description: Lights or area to turn ON when swipe up is detected.
+      default: []
+      selector:
+        target:
+          area: {}
+          entity:
+            domain: light
+
+    swipe_down_target:
+      name: Swipe Down - Turn Off
+      description: Lights or area to turn OFF when swipe down is detected.
+      default: []
+      selector:
+        target:
+          area: {}
+          entity:
+            domain: light
+
+    touchfield_toggle_target:
+      name: Touchfield - Toggle
+      description: Lights to toggle when the touchfield is pressed.
+      default: []
+      selector:
+        target:
+          entity:
+            domain: light
+
+mode: single
+
+variables:
+  swipe_up_entity: "{{ device_entities(tx_device) | select('search', 'swipe_up') | list | first }}"
+  swipe_down_entity: "{{ device_entities(tx_device) | select('search', 'swipe_down') | list | first }}"
+  touchfield_entity: "{{ device_entities(tx_device) | select('search', 'touchfield_1') | list | first }}"
+
+trigger:
+  - platform: state
+    entity_id: !lambda >
+      {% set entities = [swipe_up_entity, swipe_down_entity, touchfield_entity] %}
+      {{ entities | select | list }}
+    from: 'off'
+    to: 'on'
+
+action:
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.entity_id == swipe_up_entity }}"
+        sequence:
+          - service: light.turn_on
+            target: !input swipe_up_target
+
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.entity_id == swipe_down_entity }}"
+        sequence:
+          - service: light.turn_off
+            target: !input swipe_down_target
+
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.entity_id == touchfield_entity }}"
+        sequence:
+          - service: light.toggle
+            target: !input touchfield_toggle_target
