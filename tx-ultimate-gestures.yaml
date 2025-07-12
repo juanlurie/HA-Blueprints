@@ -75,4 +75,5 @@ action:
         sequence:
           - service: light.toggle
             target: !input touchfield_toggle_target
+
  
