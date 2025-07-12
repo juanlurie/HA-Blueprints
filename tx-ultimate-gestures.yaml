@@ -1,8 +1,8 @@
 blueprint:
-  name: TX Ultimate Gesture Control
+  name: TX Ultimate Gesture Control (4 Touchfields)
   description: >
     Control lights or areas using swipes and touches from a Sonoff TX Ultimate panel
-    with ESPHome. Handles swipe up/down and tapping a touchfield.
+    with ESPHome. Supports swipe up/down and 4 touchfields with toggle actions.
 
   domain: automation
   input:
@@ -27,14 +27,33 @@ blueprint:
       selector:
         target:
 
-    touchfield_toggle_target:
-      name: Touchfield - Toggle
-      description: Lights to toggle when the touchfield is pressed.
+    touchfield_1_toggle_target:
+      name: Touchfield 1 - Toggle
+      description: Lights to toggle when touchfield 1 is pressed.
       default: []
       selector:
         target:
-          entity:
-            domain: light
+
+    touchfield_2_toggle_target:
+      name: Touchfield 2 - Toggle
+      description: Lights to toggle when touchfield 2 is pressed.
+      default: []
+      selector:
+        target:
+
+    touchfield_3_toggle_target:
+      name: Touchfield 3 - Toggle
+      description: Lights to toggle when touchfield 3 is pressed.
+      default: []
+      selector:
+        target:
+
+    touchfield_4_toggle_target:
+      name: Touchfield 4 - Toggle
+      description: Lights to toggle when touchfield 4 is pressed.
+      default: []
+      selector:
+        target:
 
 mode: single
 
@@ -44,6 +63,9 @@ trigger:
       - binary_sensor.swipe_up
       - binary_sensor.swipe_down
       - binary_sensor.touchfield_1
+      - binary_sensor.touchfield_2
+      - binary_sensor.touchfield_3
+      - binary_sensor.touchfield_4
     from: 'off'
     to: 'on'
 
@@ -68,4 +90,25 @@ action:
             value_template: "{{ trigger.entity_id == 'binary_sensor.touchfield_1' }}"
         sequence:
           - service: light.toggle
-            target: !input touchfield_toggle_target
+            target: !input touchfield_1_toggle_target
+
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.entity_id == 'binary_sensor.touchfield_2' }}"
+        sequence:
+          - service: light.toggle
+            target: !input touchfield_2_toggle_target
+
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.entity_id == 'binary_sensor.touchfield_3' }}"
+        sequence:
+          - service: light.toggle
+            target: !input touchfield_3_toggle_target
+
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.entity_id == 'binary_sensor.touchfield_4' }}"
+        sequence:
+          - service: light.toggle
+            target: !input touchfield_4_toggle_target
