@@ -44,16 +44,12 @@ blueprint:
 
 mode: single
 
-variables:
-  swipe_up_entity: "{{ device_entities(tx_device) | select('search', 'swipe_up') | list | first }}"
-  swipe_down_entity: "{{ device_entities(tx_device) | select('search', 'swipe_down') | list | first }}"
-  touchfield_entity: "{{ device_entities(tx_device) | select('search', 'touchfield_1') | list | first }}"
-
 trigger:
   - platform: state
-    entity_id: !lambda >
-      {% set entities = [swipe_up_entity, swipe_down_entity, touchfield_entity] %}
-      {{ entities | select | list }}
+    entity_id:
+      - binary_sensor.swipe_up
+      - binary_sensor.swipe_down
+      - binary_sensor.touchfield_1
     from: 'off'
     to: 'on'
 
@@ -61,21 +57,21 @@ action:
   - choose:
       - conditions:
           - condition: template
-            value_template: "{{ trigger.entity_id == swipe_up_entity }}"
+            value_template: "{{ trigger.entity_id == 'binary_sensor.swipe_up' }}"
         sequence:
           - service: light.turn_on
             target: !input swipe_up_target
 
       - conditions:
           - condition: template
-            value_template: "{{ trigger.entity_id == swipe_down_entity }}"
+            value_template: "{{ trigger.entity_id == 'binary_sensor.swipe_down' }}"
         sequence:
           - service: light.turn_off
             target: !input swipe_down_target
 
       - conditions:
           - condition: template
-            value_template: "{{ trigger.entity_id == touchfield_entity }}"
+            value_template: "{{ trigger.entity_id == 'binary_sensor.touchfield_1' }}"
         sequence:
           - service: light.toggle
             target: !input touchfield_toggle_target
