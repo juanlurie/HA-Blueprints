@@ -76,52 +76,70 @@ action:
           - condition: template
             value_template: "{{ trigger.entity_id == 'binary_sensor.swipe_up' }}"
         sequence:
-          - condition: template
-            value_template: "{{ (swipe_up_target | length) > 0 }}"
-          - service: light.turn_on
-            target: !input swipe_up_target
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ (swipe_up_target | length) > 0 }}"
+                sequence:
+                  - service: light.turn_on
+                    target: !input swipe_up_target
 
       - conditions:
           - condition: template
             value_template: "{{ trigger.entity_id == 'binary_sensor.swipe_down' }}"
         sequence:
-          - condition: template
-            value_template: "{{ (swipe_down_target | length) > 0 }}"
-          - service: light.turn_off
-            target: !input swipe_down_target
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ (swipe_down_target | length) > 0 }}"
+                sequence:
+                  - service: light.turn_off
+                    target: !input swipe_down_target
 
       - conditions:
           - condition: template
             value_template: "{{ trigger.entity_id == 'binary_sensor.touchfield_1' }}"
         sequence:
-          - condition: template
-            value_template: "{{ (touchfield_1_toggle_target | length) > 0 }}"
-          - service: light.toggle
-            target: !input touchfield_1_toggle_target
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ (touchfield_1_toggle_target | length) > 0 }}"
+                sequence:
+                  - service: light.toggle
+                    target: !input touchfield_1_toggle_target
 
       - conditions:
           - condition: template
             value_template: "{{ trigger.entity_id == 'binary_sensor.touchfield_2' }}"
         sequence:
-          - condition: template
-            value_template: "{{ (touchfield_2_toggle_target | length) > 0 }}"
-          - service: light.toggle
-            target: !input touchfield_2_toggle_target
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ (touchfield_2_toggle_target | length) > 0 }}"
+                sequence:
+                  - service: light.toggle
+                    target: !input touchfield_2_toggle_target
 
       - conditions:
           - condition: template
             value_template: "{{ trigger.entity_id == 'binary_sensor.touchfield_3' }}"
         sequence:
-          - condition: template
-            value_template: "{{ (touchfield_3_toggle_target | length) > 0 }}"
-          - service: light.toggle
-            target: !input touchfield_3_toggle_target
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ (touchfield_3_toggle_target | length) > 0 }}"
+                sequence:
+                  - service: light.toggle
+                    target: !input touchfield_3_toggle_target
 
       - conditions:
           - condition: template
             value_template: "{{ trigger.entity_id == 'binary_sensor.touchfield_4' }}"
         sequence:
-          - condition: template
-            value_template: "{{ (touchfield_4_toggle_target | length) > 0 }}"
-          - service: light.toggle
-            target: !input touchfield_4_toggle_target
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ (touchfield_4_toggle_target | length) > 0 }}"
+                sequence:
+                  - service: light.toggle
+                    target: !input touchfield_4_toggle_target
