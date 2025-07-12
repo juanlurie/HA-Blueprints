@@ -77,7 +77,7 @@ action:
             value_template: "{{ trigger.entity_id == 'binary_sensor.swipe_up' }}"
         sequence:
           - condition: template
-            value_template: "{{ not is_state('', !input 'swipe_up_target') }}"
+            value_template: "{{ (swipe_up_target | length) > 0 }}"
           - service: light.turn_on
             target: !input swipe_up_target
 
@@ -86,7 +86,7 @@ action:
             value_template: "{{ trigger.entity_id == 'binary_sensor.swipe_down' }}"
         sequence:
           - condition: template
-            value_template: "{{ not is_state('', !input 'swipe_down_target') }}"
+            value_template: "{{ (swipe_down_target | length) > 0 }}"
           - service: light.turn_off
             target: !input swipe_down_target
 
@@ -95,7 +95,7 @@ action:
             value_template: "{{ trigger.entity_id == 'binary_sensor.touchfield_1' }}"
         sequence:
           - condition: template
-            value_template: "{{ not is_state('', !input 'touchfield_1_toggle_target') }}"
+            value_template: "{{ (touchfield_1_toggle_target | length) > 0 }}"
           - service: light.toggle
             target: !input touchfield_1_toggle_target
 
@@ -104,7 +104,7 @@ action:
             value_template: "{{ trigger.entity_id == 'binary_sensor.touchfield_2' }}"
         sequence:
           - condition: template
-            value_template: "{{ not is_state('', !input 'touchfield_2_toggle_target') }}"
+            value_template: "{{ (touchfield_2_toggle_target | length) > 0 }}"
           - service: light.toggle
             target: !input touchfield_2_toggle_target
 
@@ -113,7 +113,7 @@ action:
             value_template: "{{ trigger.entity_id == 'binary_sensor.touchfield_3' }}"
         sequence:
           - condition: template
-            value_template: "{{ not is_state('', !input 'touchfield_3_toggle_target') }}"
+            value_template: "{{ (touchfield_3_toggle_target | length) > 0 }}"
           - service: light.toggle
             target: !input touchfield_3_toggle_target
 
@@ -122,6 +122,6 @@ action:
             value_template: "{{ trigger.entity_id == 'binary_sensor.touchfield_4' }}"
         sequence:
           - condition: template
-            value_template: "{{ not is_state('', !input 'touchfield_4_toggle_target') }}"
+            value_template: "{{ (touchfield_4_toggle_target | length) > 0 }}"
           - service: light.toggle
             target: !input touchfield_4_toggle_target
