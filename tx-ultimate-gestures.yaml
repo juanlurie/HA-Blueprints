@@ -19,9 +19,6 @@ blueprint:
       default: []
       selector:
         target:
-          area: {}
-          entity:
-            domain: light
 
     swipe_down_target:
       name: Swipe Down - Turn Off
@@ -29,9 +26,6 @@ blueprint:
       default: []
       selector:
         target:
-          area: {}
-          entity:
-            domain: light
 
     touchfield_toggle_target:
       name: Touchfield - Toggle
@@ -75,5 +69,3 @@ action:
         sequence:
           - service: light.toggle
             target: !input touchfield_toggle_target
-
- 
