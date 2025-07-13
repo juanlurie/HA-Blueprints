@@ -1,9 +1,8 @@
 blueprint:
-  name: TX Ultimate Gesture Control (Device + Gesture Entity Selectors)
+  name: TX Ultimate Gesture Control (Device + Gesture Entities)
   description: >
     Control lights or areas using swipes and touches from a Sonoff TX Ultimate panel
-    with ESPHome. Select your device, then assign gesture binary sensors from that device.
-    Supports swipe up/down and 4 touchfields with toggle actions.
+    with ESPHome. Select your device, then assign gesture binary sensors.
   domain: automation
   input:
     tx_device:
@@ -14,91 +13,67 @@ blueprint:
 
     swipe_up_entity:
       name: Swipe Up Gesture Sensor
-      description: Select the binary sensor entity for swipe up gesture from the device.
       selector:
         entity:
           domain: binary_sensor
-          device: !input tx_device
 
     swipe_up_target:
       name: Swipe Up - Turn On Targets
-      description: Lights or area to turn ON when swipe up is detected.
-      default: []
       selector:
         target:
 
     swipe_down_entity:
       name: Swipe Down Gesture Sensor
-      description: Select the binary sensor entity for swipe down gesture from the device.
       selector:
         entity:
           domain: binary_sensor
-          device: !input tx_device
 
     swipe_down_target:
       name: Swipe Down - Turn Off Targets
-      description: Lights or area to turn OFF when swipe down is detected.
-      default: []
       selector:
         target:
 
     touchfield_1_entity:
       name: Touchfield 1 Gesture Sensor
-      description: Select the binary sensor entity for touchfield 1 from the device.
       selector:
         entity:
           domain: binary_sensor
-          device: !input tx_device
 
     touchfield_1_toggle_target:
       name: Touchfield 1 - Toggle Targets
-      description: Lights to toggle when touchfield 1 is pressed.
-      default: []
       selector:
         target:
 
     touchfield_2_entity:
       name: Touchfield 2 Gesture Sensor
-      description: Select the binary sensor entity for touchfield 2 from the device.
       selector:
         entity:
           domain: binary_sensor
-          device: !input tx_device
 
     touchfield_2_toggle_target:
       name: Touchfield 2 - Toggle Targets
-      description: Lights to toggle when touchfield 2 is pressed.
-      default: []
       selector:
         target:
 
     touchfield_3_entity:
       name: Touchfield 3 Gesture Sensor
-      description: Select the binary sensor entity for touchfield 3 from the device.
       selector:
         entity:
           domain: binary_sensor
-          device: !input tx_device
 
     touchfield_3_toggle_target:
       name: Touchfield 3 - Toggle Targets
-      description: Lights to toggle when touchfield 3 is pressed.
-      default: []
       selector:
         target:
 
     touchfield_4_entity:
       name: Touchfield 4 Gesture Sensor
-      description: Select the binary sensor entity for touchfield 4 from the device.
       selector:
         entity:
           domain: binary_sensor
-          device: !input tx_device
 
     touchfield_4_toggle_target:
       name: Touchfield 4 - Toggle Targets
-      description: Lights to toggle when touchfield 4 is pressed.
-      default: []
       selector:
         target:
 
