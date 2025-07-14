@@ -1,8 +1,8 @@
 blueprint:
-  name: TX Gesture Control (All Sensors, Configurable Actions)
+  name: TX Gesture Control (Safe + All Inputs Optional)
   description: >
     Responds to swipe gestures (up/down) and touch fields (1–4) from a Sonoff TX Ultimate panel.
-    Each input is optional. You can configure which targets and action to perform for each gesture.
+    Each input is optional and ignored if left blank.
   domain: automation
 
   input:
@@ -98,115 +98,38 @@ blueprint:
       selector:
         target:
 
-    touchfield_3_entity:
-      name: Touch Field 3 Sensor (Optional)
-      default: ""
-      selector:
-        entity:
-          domain: binary_sensor
-
-    touchfield_3_action:
-      name: Touch Field 3 Action
-      default: toggle
-      selector:
-        select:
-          options:
-            - toggle
-            - turn_on
-            - turn_off
-
-    touchfield_3_targets:
-      name: Touch Field 3 Targets
-      default: []
-      selector:
-        target:
-
-    touchfield_4_entity:
-      name: Touch Field 4 Sensor (Optional)
-      default: ""
-      selector:
-        entity:
-          domain: binary_sensor
-
-    touchfield_4_action:
-      name: Touch Field 4 Action
-      default: toggle
-      selector:
-        select:
-          options:
-            - toggle
-            - turn_on
-            - turn_off
-
-    touchfield_4_targets:
-      name: Touch Field 4 Targets
-      default: []
-      selector:
-        target:
-
 mode: single
 
+# Use a wildcard trigger and do the logic in action
 trigger:
   - platform: state
-    entity_id: !input swipe_up_entity
+    entity_id:
+      - !input swipe_up_entity
+      - !input swipe_down_entity
+      - !input touchfield_1_entity
+      - !input touchfield_2_entity
     from: 'off'
     to: 'on'
-    id: swipe_up
-  - platform: state
-    entity_id: !input swipe_down_entity
-    from: 'off'
-    to: 'on'
-    id: swipe_down
-  - platform: state
-    entity_id: !input touchfield_1_entity
-    from: 'off'
-    to: 'on'
-    id: touch_1
-  - platform: state
-    entity_id: !input touchfield_2_entity
-    from: 'off'
-    to: 'on'
-    id: touch_2
-  - platform: state
-    entity_id: !input touchfield_3_entity
-    from: 'off'
-    to: 'on'
-    id: touch_3
-  - platform: state
-    entity_id: !input touchfield_4_entity
-    from: 'off'
-    to: 'on'
-    id: touch_4
 
 action:
   - variables:
-      action_map:
-        swipe_up:
-          service: "light.{{ iif(swipe_up_action == 'toggle', 'toggle', swipe_up_action) }}"
+      gesture_map:
+        "{{ swipe_up_entity }}":
+          service: "light.{{ swipe_up_action }}"
           targets: !input swipe_up_targets
-        swipe_down:
-          service: "light.{{ iif(swipe_down_action == 'toggle', 'toggle', swipe_down_action) }}"
+        "{{ swipe_down_entity }}":
+          service: "light.{{ swipe_down_action }}"
           targets: !input swipe_down_targets
-        touch_1:
-          service: "light.{{ iif(touchfield_1_action == 'toggle', 'toggle', touchfield_1_action) }}"
+        "{{ touchfield_1_entity }}":
+          service: "light.{{ touchfield_1_action }}"
           targets: !input touchfield_1_targets
-        touch_2:
-          service: "light.{{ iif(touchfield_2_action == 'toggle', 'toggle', touchfield_2_action) }}"
+        "{{ touchfield_2_entity }}":
+          service: "light.{{ touchfield_2_action }}"
           targets: !input touchfield_2_targets
-        touch_3:
-          service: "light.{{ iif(touchfield_3_action == 'toggle', 'toggle', touchfield_3_action) }}"
-          targets: !input touchfield_3_targets
-        touch_4:
-          service: "light.{{ iif(touchfield_4_action == 'toggle', 'toggle', touchfield_4_action) }}"
-          targets: !input touchfield_4_targets
-
-  - service: system_log.write
-    data:
-      message: "Gesture Triggered: {{ trigger.id }}"
-      level: info
 
   - choose:
-      - conditions: "{{ trigger.id in action_map and (action_map[trigger.id].targets | length > 0) }}"
+      - conditions: >
+          {{ trigger.entity_id in gesture_map and (gesture_map[trigger.entity_id].targets | length > 0) }}
         sequence:
-          - service: "{{ action_map[trigger.id].service }}"
-            target: "{{ action_map[trigger.id].targets }}"
+          - service: "{{ gesture_map[trigger.entity_id].service }}"
+            target: "{{ gesture_map[trigger.entity_id].targets }}"
