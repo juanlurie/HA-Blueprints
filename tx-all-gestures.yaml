@@ -1,8 +1,8 @@
 blueprint:
-  name: TX Gesture Control (Safe + All Inputs Optional)
+  name: TX Gesture Control (Robust & Optional Inputs)
   description: >
-    Responds to swipe gestures (up/down) and touch fields (1–4) from a Sonoff TX Ultimate panel.
-    Each input is optional and ignored if left blank.
+    Responds to TX Ultimate swipe or touch gestures and toggles/controls selected targets.
+    Each input is optional. Only configured gestures will be triggered.
   domain: automation
 
   input:
@@ -52,14 +52,14 @@ blueprint:
       selector:
         target:
 
-    touchfield_1_entity:
-      name: Touch Field 1 Sensor (Optional)
+    touch_1_entity:
+      name: Touch Field 1 (Optional)
       default: ""
       selector:
         entity:
           domain: binary_sensor
 
-    touchfield_1_action:
+    touch_1_action:
       name: Touch Field 1 Action
       default: toggle
       selector:
@@ -69,20 +69,20 @@ blueprint:
             - turn_on
             - turn_off
 
-    touchfield_1_targets:
+    touch_1_targets:
       name: Touch Field 1 Targets
       default: []
       selector:
         target:
 
-    touchfield_2_entity:
-      name: Touch Field 2 Sensor (Optional)
+    touch_2_entity:
+      name: Touch Field 2 (Optional)
       default: ""
       selector:
         entity:
           domain: binary_sensor
 
-    touchfield_2_action:
+    touch_2_action:
       name: Touch Field 2 Action
       default: toggle
       selector:
@@ -92,7 +92,7 @@ blueprint:
             - turn_on
             - turn_off
 
-    touchfield_2_targets:
+    touch_2_targets:
       name: Touch Field 2 Targets
       default: []
       selector:
@@ -100,36 +100,49 @@ blueprint:
 
 mode: single
 
-# Use a wildcard trigger and do the logic in action
 trigger:
   - platform: state
-    entity_id:
-      - !input swipe_up_entity
-      - !input swipe_down_entity
-      - !input touchfield_1_entity
-      - !input touchfield_2_entity
+    entity_id: !input swipe_up_entity
     from: 'off'
     to: 'on'
+    id: swipe_up
+
+  - platform: state
+    entity_id: !input swipe_down_entity
+    from: 'off'
+    to: 'on'
+    id: swipe_down
+
+  - platform: state
+    entity_id: !input touch_1_entity
+    from: 'off'
+    to: 'on'
+    id: touch_1
+
+  - platform: state
+    entity_id: !input touch_2_entity
+    from: 'off'
+    to: 'on'
+    id: touch_2
 
 action:
-  - variables:
-      gesture_map:
-        "{{ swipe_up_entity }}":
-          service: "light.{{ swipe_up_action }}"
-          targets: !input swipe_up_targets
-        "{{ swipe_down_entity }}":
-          service: "light.{{ swipe_down_action }}"
-          targets: !input swipe_down_targets
-        "{{ touchfield_1_entity }}":
-          service: "light.{{ touchfield_1_action }}"
-          targets: !input touchfield_1_targets
-        "{{ touchfield_2_entity }}":
-          service: "light.{{ touchfield_2_action }}"
-          targets: !input touchfield_2_targets
-
   - choose:
-      - conditions: >
-          {{ trigger.entity_id in gesture_map and (gesture_map[trigger.entity_id].targets | length > 0) }}
+      - conditions: "{{ trigger.id == 'swipe_up' and (swipe_up_targets | length > 0) }}"
         sequence:
-          - service: "{{ gesture_map[trigger.entity_id].service }}"
-            target: "{{ gesture_map[trigger.entity_id].targets }}"
+          - service: "light.{{ swipe_up_action }}"
+            target: !input swipe_up_targets
+
+      - conditions: "{{ trigger.id == 'swipe_down' and (swipe_down_targets | length > 0) }}"
+        sequence:
+          - service: "light.{{ swipe_down_action }}"
+            target: !input swipe_down_targets
+
+      - conditions: "{{ trigger.id == 'touch_1' and (touch_1_targets | length > 0) }}"
+        sequence:
+          - service: "light.{{ touch_1_action }}"
+            target: !input touch_1_targets
+
+      - conditions: "{{ trigger.id == 'touch_2' and (touch_2_targets | length > 0) }}"
+        sequence:
+          - service: "light.{{ touch_2_action }}"
+            target: !input touch_2_targets
