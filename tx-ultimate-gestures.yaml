@@ -1,5 +1,5 @@
 blueprint:
-  name: TX Ultimate Gesture Control (Optional, with dummy defaults)
+  name: TX Ultimate Gesture Control (Fixed)
   description: >
     Control lights or areas using swipes and touches from a Sonoff TX Ultimate panel.
     Each gesture input and target is optional.
@@ -124,69 +124,70 @@ trigger:
     to: 'on'
 
 action:
+  - variables:
+      swipe_up_entity: !input swipe_up_entity
+      swipe_down_entity: !input swipe_down_entity
+      touchfield_1_entity: !input touchfield_1_entity
+      touchfield_2_entity: !input touchfield_2_entity
+      touchfield_3_entity: !input touchfield_3_entity
+      touchfield_4_entity: !input touchfield_4_entity
+      swipe_up_target: !input swipe_up_target
+      swipe_down_target: !input swipe_down_target
+      touchfield_1_toggle_target: !input touchfield_1_toggle_target
+      touchfield_2_toggle_target: !input touchfield_2_toggle_target
+      touchfield_3_toggle_target: !input touchfield_3_toggle_target
+      touchfield_4_toggle_target: !input touchfield_4_toggle_target
+
+  - service: system_log.write
+    data:
+      message: "TX Gesture Triggered: {{ trigger.entity_id }}"
+      level: info
+
   - choose:
       - conditions:
           - condition: template
             value_template: >
-              {{ trigger.entity_id != 'binary_sensor.dummy' and
-                 trigger.entity_id == swipe_up_entity and
-                 swipe_up_target | length > 0 }}
+              {{ trigger.entity_id == swipe_up_entity and swipe_up_target | length > 0 }}
         sequence:
           - service: light.turn_on
-            data:
-              entity_id: "{{ swipe_up_target | join(',') }}"
+            target: "{{ swipe_up_target }}"
 
       - conditions:
           - condition: template
             value_template: >
-              {{ trigger.entity_id != 'binary_sensor.dummy' and
-                 trigger.entity_id == swipe_down_entity and
-                 swipe_down_target | length > 0 }}
+              {{ trigger.entity_id == swipe_down_entity and swipe_down_target | length > 0 }}
         sequence:
           - service: light.turn_off
-            data:
-              entity_id: "{{ swipe_down_target | join(',') }}"
+            target: "{{ swipe_down_target }}"
 
       - conditions:
           - condition: template
             value_template: >
-              {{ trigger.entity_id != 'binary_sensor.dummy' and
-                 trigger.entity_id == touchfield_1_entity and
-                 touchfield_1_toggle_target | length > 0 }}
+              {{ trigger.entity_id == touchfield_1_entity and touchfield_1_toggle_target | length > 0 }}
         sequence:
           - service: light.toggle
-            data:
-              entity_id: "{{ touchfield_1_toggle_target | join(',') }}"
+            target: "{{ touchfield_1_toggle_target }}"
 
       - conditions:
           - condition: template
             value_template: >
-              {{ trigger.entity_id != 'binary_sensor.dummy' and
-                 trigger.entity_id == touchfield_2_entity and
-                 touchfield_2_toggle_target | length > 0 }}
+              {{ trigger.entity_id == touchfield_2_entity and touchfield_2_toggle_target | length > 0 }}
         sequence:
           - service: light.toggle
-            data:
-              entity_id: "{{ touchfield_2_toggle_target | join(',') }}"
+            target: "{{ touchfield_2_toggle_target }}"
 
       - conditions:
           - condition: template
             value_template: >
-              {{ trigger.entity_id != 'binary_sensor.dummy' and
-                 trigger.entity_id == touchfield_3_entity and
-                 touchfield_3_toggle_target | length > 0 }}
+              {{ trigger.entity_id == touchfield_3_entity and touchfield_3_toggle_target | length > 0 }}
         sequence:
           - service: light.toggle
-            data:
-              entity_id: "{{ touchfield_3_toggle_target | join(',') }}"
+            target: "{{ touchfield_3_toggle_target }}"
 
       - conditions:
           - condition: template
             value_template: >
-              {{ trigger.entity_id != 'binary_sensor.dummy' and
-                 trigger.entity_id == touchfield_4_entity and
-                 touchfield_4_toggle_target | length > 0 }}
+              {{ trigger.entity_id == touchfield_4_entity and touchfield_4_toggle_target | length > 0 }}
         sequence:
           - service: light.toggle
-            data:
-              entity_id: "{{ touchfield_4_toggle_target | join(',') }}"
+            target: "{{ touchfield_4_toggle_target }}"
