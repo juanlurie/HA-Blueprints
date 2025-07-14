@@ -1,8 +1,7 @@
 blueprint:
-  name: TX Gesture
+  name: TX Gesture - Swipe Up Control
   description: >
-    Responds to a gesture from a Sonoff TX Ultimate panel
-    by toggling the specified targets.
+    Toggles the selected targets when a gesture (binary sensor) changes from off to on.
   domain: automation
 
   input:
@@ -14,7 +13,6 @@ blueprint:
 
     targets_to_toggle:
       name: Targets to Toggle
-      default: []
       selector:
         target:
 
@@ -22,18 +20,14 @@ mode: single
 
 trigger:
   - platform: state
-    entity_id: !input gesture_entity    
+    entity_id: !input gesture_entity
+    from: 'off'
     to: 'on'
-
-condition:
-  - condition: template
-    value_template: >
-      {{ (targets_to_toggle | length) > 0 }}
 
 action:
   - service: system_log.write
     data:
-      message: "Swipe Up Triggered: {{ trigger.entity_id }}"
+      message: "Gesture triggered: {{ trigger.entity_id }}"
       level: info
 
   - service: light.toggle
