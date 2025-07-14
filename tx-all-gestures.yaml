@@ -1,13 +1,13 @@
 blueprint:
-  name: TX Gesture Control (Robust & Optional Inputs)
+  name: TX Gesture Control (Reliable Version)
   description: >
-    Responds to TX Ultimate swipe or touch gestures and toggles/controls selected targets.
-    Each input is optional. Only configured gestures will be triggered.
+    Responds to TX Ultimate swipe or touch gestures and performs the selected action
+    (toggle, turn_on, turn_off) on provided targets. Each gesture is optional.
   domain: automation
 
   input:
     swipe_up_entity:
-      name: Swipe Up Sensor (Optional)
+      name: Swipe Up Sensor
       default: ""
       selector:
         entity:
@@ -30,7 +30,7 @@ blueprint:
         target:
 
     swipe_down_entity:
-      name: Swipe Down Sensor (Optional)
+      name: Swipe Down Sensor
       default: ""
       selector:
         entity:
@@ -52,97 +52,51 @@ blueprint:
       selector:
         target:
 
-    touch_1_entity:
-      name: Touch Field 1 (Optional)
-      default: ""
-      selector:
-        entity:
-          domain: binary_sensor
-
-    touch_1_action:
-      name: Touch Field 1 Action
-      default: toggle
-      selector:
-        select:
-          options:
-            - toggle
-            - turn_on
-            - turn_off
-
-    touch_1_targets:
-      name: Touch Field 1 Targets
-      default: []
-      selector:
-        target:
-
-    touch_2_entity:
-      name: Touch Field 2 (Optional)
-      default: ""
-      selector:
-        entity:
-          domain: binary_sensor
-
-    touch_2_action:
-      name: Touch Field 2 Action
-      default: toggle
-      selector:
-        select:
-          options:
-            - toggle
-            - turn_on
-            - turn_off
-
-    touch_2_targets:
-      name: Touch Field 2 Targets
-      default: []
-      selector:
-        target:
-
 mode: single
 
 trigger:
   - platform: state
     entity_id: !input swipe_up_entity
-    from: 'off'
-    to: 'on'
+    from: "off"
+    to: "on"
     id: swipe_up
 
   - platform: state
     entity_id: !input swipe_down_entity
-    from: 'off'
-    to: 'on'
+    from: "off"
+    to: "on"
     id: swipe_down
-
-  - platform: state
-    entity_id: !input touch_1_entity
-    from: 'off'
-    to: 'on'
-    id: touch_1
-
-  - platform: state
-    entity_id: !input touch_2_entity
-    from: 'off'
-    to: 'on'
-    id: touch_2
 
 action:
   - choose:
-      - conditions: "{{ trigger.id == 'swipe_up' and (swipe_up_targets | length > 0) }}"
+      - conditions: "{{ trigger.id == 'swipe_up' }}"
         sequence:
-          - service: "light.{{ swipe_up_action }}"
-            target: !input swipe_up_targets
+          - choose:
+              - conditions: "{{ swipe_up_action == 'toggle' }}"
+                sequence:
+                  - service: light.toggle
+                    target: !input swipe_up_targets
+              - conditions: "{{ swipe_up_action == 'turn_on' }}"
+                sequence:
+                  - service: light.turn_on
+                    target: !input swipe_up_targets
+              - conditions: "{{ swipe_up_action == 'turn_off' }}"
+                sequence:
+                  - service: light.turn_off
+                    target: !input swipe_up_targets
 
-      - conditions: "{{ trigger.id == 'swipe_down' and (swipe_down_targets | length > 0) }}"
+      - conditions: "{{ trigger.id == 'swipe_down' }}"
         sequence:
-          - service: "light.{{ swipe_down_action }}"
-            target: !input swipe_down_targets
-
-      - conditions: "{{ trigger.id == 'touch_1' and (touch_1_targets | length > 0) }}"
-        sequence:
-          - service: "light.{{ touch_1_action }}"
-            target: !input touch_1_targets
-
-      - conditions: "{{ trigger.id == 'touch_2' and (touch_2_targets | length > 0) }}"
-        sequence:
-          - service: "light.{{ touch_2_action }}"
-            target: !input touch_2_targets
+          - choose:
+              - conditions: "{{ swipe_down_action == 'toggle' }}"
+                sequence:
+                  - service: light.toggle
+                    target: !input swipe_down_targets
+              - conditions: "{{ swipe_down_action == 'turn_on' }}"
+                sequence:
+                  - service: light.turn_on
+                    target: !input swipe_down_targets
+              - conditions: "{{ swipe_down_action == 'turn_off' }}"
+                sequence:
+                  - service: light.turn_off
+                    target: !input swipe_down_targets
