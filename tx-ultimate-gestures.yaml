@@ -1,91 +1,19 @@
 blueprint:
-  name: TX Ultimate Gesture Control (Fixed)
+  name: TX Gesture - Swipe Up Control
   description: >
-    Control lights or areas using swipes and touches from a Sonoff TX Ultimate panel.
-    Each gesture input and target is optional.
-    Use dummy entity 'binary_sensor.dummy' as default for optional gesture sensors.
+    Responds to a Swipe Up gesture from a Sonoff TX Ultimate panel
+    by turning on the specified targets.
   domain: automation
 
   input:
-    tx_device:
-      name: TX Ultimate Device
-      selector:
-        device:
-
-    swipe_up_entity:
+    gesture_entity:
       name: Swipe Up Gesture Sensor
-      default: binary_sensor.dummy
       selector:
         entity:
           domain: binary_sensor
 
-    swipe_up_target:
-      name: Swipe Up - Turn On Targets
-      default: []
-      selector:
-        target:
-
-    swipe_down_entity:
-      name: Swipe Down Gesture Sensor
-      default: binary_sensor.dummy
-      selector:
-        entity:
-          domain: binary_sensor
-
-    swipe_down_target:
-      name: Swipe Down - Turn Off Targets
-      default: []
-      selector:
-        target:
-
-    touchfield_1_entity:
-      name: Touchfield 1 Gesture Sensor
-      default: binary_sensor.dummy
-      selector:
-        entity:
-          domain: binary_sensor
-
-    touchfield_1_toggle_target:
-      name: Touchfield 1 - Toggle Targets
-      default: []
-      selector:
-        target:
-
-    touchfield_2_entity:
-      name: Touchfield 2 Gesture Sensor
-      default: binary_sensor.dummy
-      selector:
-        entity:
-          domain: binary_sensor
-
-    touchfield_2_toggle_target:
-      name: Touchfield 2 - Toggle Targets
-      default: []
-      selector:
-        target:
-
-    touchfield_3_entity:
-      name: Touchfield 3 Gesture Sensor
-      default: binary_sensor.dummy
-      selector:
-        entity:
-          domain: binary_sensor
-
-    touchfield_3_toggle_target:
-      name: Touchfield 3 - Toggle Targets
-      default: []
-      selector:
-        target:
-
-    touchfield_4_entity:
-      name: Touchfield 4 Gesture Sensor
-      default: binary_sensor.dummy
-      selector:
-        entity:
-          domain: binary_sensor
-
-    touchfield_4_toggle_target:
-      name: Touchfield 4 - Toggle Targets
+    targets_to_turn_on:
+      name: Targets to Turn On
       default: []
       selector:
         target:
@@ -94,100 +22,20 @@ mode: single
 
 trigger:
   - platform: state
-    entity_id: !input swipe_up_entity
+    entity_id: !input gesture_entity
     from: 'off'
     to: 'on'
 
-  - platform: state
-    entity_id: !input swipe_down_entity
-    from: 'off'
-    to: 'on'
-
-  - platform: state
-    entity_id: !input touchfield_1_entity
-    from: 'off'
-    to: 'on'
-
-  - platform: state
-    entity_id: !input touchfield_2_entity
-    from: 'off'
-    to: 'on'
-
-  - platform: state
-    entity_id: !input touchfield_3_entity
-    from: 'off'
-    to: 'on'
-
-  - platform: state
-    entity_id: !input touchfield_4_entity
-    from: 'off'
-    to: 'on'
+condition:
+  - condition: template
+    value_template: >
+      {{ (targets_to_turn_on | length) > 0 }}
 
 action:
-  - variables:
-      swipe_up_entity: !input swipe_up_entity
-      swipe_down_entity: !input swipe_down_entity
-      touchfield_1_entity: !input touchfield_1_entity
-      touchfield_2_entity: !input touchfield_2_entity
-      touchfield_3_entity: !input touchfield_3_entity
-      touchfield_4_entity: !input touchfield_4_entity
-      swipe_up_target: !input swipe_up_target
-      swipe_down_target: !input swipe_down_target
-      touchfield_1_toggle_target: !input touchfield_1_toggle_target
-      touchfield_2_toggle_target: !input touchfield_2_toggle_target
-      touchfield_3_toggle_target: !input touchfield_3_toggle_target
-      touchfield_4_toggle_target: !input touchfield_4_toggle_target
-
   - service: system_log.write
     data:
-      message: "TX Gesture Triggered: {{ trigger.entity_id }}"
+      message: "Swipe Up Triggered: {{ trigger.entity_id }}"
       level: info
 
-  - choose:
-      - conditions:
-          - condition: template
-            value_template: >
-              {{ trigger.entity_id == swipe_up_entity and swipe_up_target | length > 0 }}
-        sequence:
-          - service: light.turn_on
-            target: "{{ swipe_up_target }}"
-
-      - conditions:
-          - condition: template
-            value_template: >
-              {{ trigger.entity_id == swipe_down_entity and swipe_down_target | length > 0 }}
-        sequence:
-          - service: light.turn_off
-            target: "{{ swipe_down_target }}"
-
-      - conditions:
-          - condition: template
-            value_template: >
-              {{ trigger.entity_id == touchfield_1_entity and touchfield_1_toggle_target | length > 0 }}
-        sequence:
-          - service: light.toggle
-            target: "{{ touchfield_1_toggle_target }}"
-
-      - conditions:
-          - condition: template
-            value_template: >
-              {{ trigger.entity_id == touchfield_2_entity and touchfield_2_toggle_target | length > 0 }}
-        sequence:
-          - service: light.toggle
-            target: "{{ touchfield_2_toggle_target }}"
-
-      - conditions:
-          - condition: template
-            value_template: >
-              {{ trigger.entity_id == touchfield_3_entity and touchfield_3_toggle_target | length > 0 }}
-        sequence:
-          - service: light.toggle
-            target: "{{ touchfield_3_toggle_target }}"
-
-      - conditions:
-          - condition: template
-            value_template: >
-              {{ trigger.entity_id == touchfield_4_entity and touchfield_4_toggle_target | length > 0 }}
-        sequence:
-          - service: light.toggle
-            target: "{{ touchfield_4_toggle_target }}"
+  - service: light.turn_on
+    target: !input targets_to_turn_on
