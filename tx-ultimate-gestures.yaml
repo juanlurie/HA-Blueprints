@@ -7,13 +7,13 @@ blueprint:
 
   input:
     gesture_entity:
-      name: Swipe Up Gesture Sensor
+      name: Gesture Sensor
       selector:
         entity:
           domain: binary_sensor
 
-    targets_to_turn_on:
-      name: Targets to Turn On
+    targets_to_toggle:
+      name: Targets to Toggle
       default: []
       selector:
         target:
@@ -29,7 +29,7 @@ trigger:
 condition:
   - condition: template
     value_template: >
-      {{ (targets_to_turn_on | length) > 0 }}
+      {{ (targets_to_toggle | length) > 0 }}
 
 action:
   - service: system_log.write
@@ -37,5 +37,5 @@ action:
       message: "Swipe Up Triggered: {{ trigger.entity_id }}"
       level: info
 
-  - service: light.turn_on
-    target: !input targets_to_turn_on
+  - service: light.toggle
+    target: !input targets_to_toggle
