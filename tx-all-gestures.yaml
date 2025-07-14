@@ -1,1 +1,212 @@
+blueprint:
+  name: TX Gesture Control (All Sensors, Configurable Actions)
+  description: >
+    Responds to swipe gestures (up/down) and touch fields (1–4) from a Sonoff TX Ultimate panel.
+    Each input is optional. You can configure which targets and action to perform for each gesture.
+  domain: automation
 
+  input:
+    swipe_up_entity:
+      name: Swipe Up Sensor (Optional)
+      default: ""
+      selector:
+        entity:
+          domain: binary_sensor
+
+    swipe_up_action:
+      name: Swipe Up Action
+      default: toggle
+      selector:
+        select:
+          options:
+            - toggle
+            - turn_on
+            - turn_off
+
+    swipe_up_targets:
+      name: Swipe Up Targets
+      default: []
+      selector:
+        target:
+
+    swipe_down_entity:
+      name: Swipe Down Sensor (Optional)
+      default: ""
+      selector:
+        entity:
+          domain: binary_sensor
+
+    swipe_down_action:
+      name: Swipe Down Action
+      default: toggle
+      selector:
+        select:
+          options:
+            - toggle
+            - turn_on
+            - turn_off
+
+    swipe_down_targets:
+      name: Swipe Down Targets
+      default: []
+      selector:
+        target:
+
+    touchfield_1_entity:
+      name: Touch Field 1 Sensor (Optional)
+      default: ""
+      selector:
+        entity:
+          domain: binary_sensor
+
+    touchfield_1_action:
+      name: Touch Field 1 Action
+      default: toggle
+      selector:
+        select:
+          options:
+            - toggle
+            - turn_on
+            - turn_off
+
+    touchfield_1_targets:
+      name: Touch Field 1 Targets
+      default: []
+      selector:
+        target:
+
+    touchfield_2_entity:
+      name: Touch Field 2 Sensor (Optional)
+      default: ""
+      selector:
+        entity:
+          domain: binary_sensor
+
+    touchfield_2_action:
+      name: Touch Field 2 Action
+      default: toggle
+      selector:
+        select:
+          options:
+            - toggle
+            - turn_on
+            - turn_off
+
+    touchfield_2_targets:
+      name: Touch Field 2 Targets
+      default: []
+      selector:
+        target:
+
+    touchfield_3_entity:
+      name: Touch Field 3 Sensor (Optional)
+      default: ""
+      selector:
+        entity:
+          domain: binary_sensor
+
+    touchfield_3_action:
+      name: Touch Field 3 Action
+      default: toggle
+      selector:
+        select:
+          options:
+            - toggle
+            - turn_on
+            - turn_off
+
+    touchfield_3_targets:
+      name: Touch Field 3 Targets
+      default: []
+      selector:
+        target:
+
+    touchfield_4_entity:
+      name: Touch Field 4 Sensor (Optional)
+      default: ""
+      selector:
+        entity:
+          domain: binary_sensor
+
+    touchfield_4_action:
+      name: Touch Field 4 Action
+      default: toggle
+      selector:
+        select:
+          options:
+            - toggle
+            - turn_on
+            - turn_off
+
+    touchfield_4_targets:
+      name: Touch Field 4 Targets
+      default: []
+      selector:
+        target:
+
+mode: single
+
+trigger:
+  - platform: state
+    entity_id: !input swipe_up_entity
+    from: 'off'
+    to: 'on'
+    id: swipe_up
+  - platform: state
+    entity_id: !input swipe_down_entity
+    from: 'off'
+    to: 'on'
+    id: swipe_down
+  - platform: state
+    entity_id: !input touchfield_1_entity
+    from: 'off'
+    to: 'on'
+    id: touch_1
+  - platform: state
+    entity_id: !input touchfield_2_entity
+    from: 'off'
+    to: 'on'
+    id: touch_2
+  - platform: state
+    entity_id: !input touchfield_3_entity
+    from: 'off'
+    to: 'on'
+    id: touch_3
+  - platform: state
+    entity_id: !input touchfield_4_entity
+    from: 'off'
+    to: 'on'
+    id: touch_4
+
+action:
+  - variables:
+      action_map:
+        swipe_up:
+          service: "light.{{ iif(swipe_up_action == 'toggle', 'toggle', swipe_up_action) }}"
+          targets: !input swipe_up_targets
+        swipe_down:
+          service: "light.{{ iif(swipe_down_action == 'toggle', 'toggle', swipe_down_action) }}"
+          targets: !input swipe_down_targets
+        touch_1:
+          service: "light.{{ iif(touchfield_1_action == 'toggle', 'toggle', touchfield_1_action) }}"
+          targets: !input touchfield_1_targets
+        touch_2:
+          service: "light.{{ iif(touchfield_2_action == 'toggle', 'toggle', touchfield_2_action) }}"
+          targets: !input touchfield_2_targets
+        touch_3:
+          service: "light.{{ iif(touchfield_3_action == 'toggle', 'toggle', touchfield_3_action) }}"
+          targets: !input touchfield_3_targets
+        touch_4:
+          service: "light.{{ iif(touchfield_4_action == 'toggle', 'toggle', touchfield_4_action) }}"
+          targets: !input touchfield_4_targets
+
+  - service: system_log.write
+    data:
+      message: "Gesture Triggered: {{ trigger.id }}"
+      level: info
+
+  - choose:
+      - conditions: "{{ trigger.id in action_map and (action_map[trigger.id].targets | length > 0) }}"
+        sequence:
+          - service: "{{ action_map[trigger.id].service }}"
+            target: "{{ action_map[trigger.id].targets }}"
