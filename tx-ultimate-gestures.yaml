@@ -1,8 +1,8 @@
 blueprint:
-  name: TX Gesture - Swipe Up Control
+  name: TX Gesture
   description: >
-    Responds to a Swipe Up gesture from a Sonoff TX Ultimate panel
-    by turning on the specified targets.
+    Responds to a gesture from a Sonoff TX Ultimate panel
+    by toggling the specified targets.
   domain: automation
 
   input:
@@ -22,8 +22,7 @@ mode: single
 
 trigger:
   - platform: state
-    entity_id: !input gesture_entity
-    from: 'off'
+    entity_id: !input gesture_entity    
     to: 'on'
 
 condition:
